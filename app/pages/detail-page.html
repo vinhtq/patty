@@ -1,0 +1,138 @@
+<dom-module id="detail-page">
+  <style>
+  .fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+  }
+
+  paper-toolbar {
+    --paper-toolbar-background: white;
+    --paper-toolbar-color: black;
+    --paper-toolbar-title: {
+        margin-left: 5px !important;
+      }
+  }
+
+  paper-icon-button.gray {
+    --paper-icon-button: {
+      color: #999;
+    }
+  }
+
+  paper-spinner {
+    margin-top: 20px;
+  }
+
+  .content {
+    position: relative;
+  }
+
+  .content .feature-image { max-height: 230px; overflow: hidden; }
+  .content .feature-image img { width: 100%; }
+
+  .content .detail {
+    padding: 10px 16px;
+  }
+
+  .meta { clear: both; width: 100%; height: 20px; font-style: italic; font-size: 12px; }
+  .meta .author { float: left; }
+  .meta .time { float: right; }
+
+  </style>
+
+  <template>
+    <div id="fixed" class="fixed"></div>
+
+    <paper-header-panel id="headerPanelMain" class="flex">
+      <paper-toolbar>
+        <paper-icon-button icon="close" on-tap="close"></paper-icon-button>
+        <div class="title"></div>
+        <paper-icon-button class="gray" icon="bookmark-border"></paper-icon-button>
+        <paper-icon-button class="gray" icon="social:share"></paper-icon-button>
+      </paper-toolbar>
+
+      <div class="content">
+        <template is="dom-if" if="[[!posts]]">
+          <div class="horizontal center-justified layout">
+            <paper-spinner alt="Loading..." active></paper-spinner>
+          </div>
+        </template>
+          
+        <template is="dom-if" if="[[posts]]">
+          <template is="dom-repeat" items="[[posts]]" as="post" filter="{{isSelected(selectedPost)}}">
+            <div class="feature-image">
+              <img src="[[post.feature_image]]" alt="">
+            </div>
+            <div class="detail">
+              <div class="meta">
+                <div class="author">[[post.author]]</div>
+                <div class="time">[[post.date_posted]]</div>
+              </div>
+              <h4 class="post-title">[[post.title]]</h4>
+
+              <template is="juicy-html" content$="[[post.content]]"></template>
+            </div>
+          </template>
+        </template>
+
+      </div>
+    </paper-header-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'detail-page',
+
+      behaviors: [Polymer.NeonSharedElementAnimatableBehavior],
+
+      properties: {
+        selectedPost: {
+          type: Number
+        },
+
+        animationConfig: {
+          value: function() {
+            return {
+              'entry': [{
+                name: 'ripple-animation',
+                id: 'ripple',
+                toPage: this,
+              }, {
+                name: 'fade-in-animation',
+                node: this
+              }]
+            }
+          }
+        },
+
+        sharedElements: {
+          type: Object,
+          value: function() {
+            return {
+              'ripple': this.$.fixed
+            }
+          }
+        },
+      },
+
+      isSelected: function(selectedId) {
+        if (!selectedId) {
+          // set filter to null to disable filtering
+          return null;
+        }
+
+        return function(post) {
+          return post.id == selectedId;
+        }
+      },
+
+      close: function() {
+        page('/');
+      }
+    });
+  </script>
+</dom-module>

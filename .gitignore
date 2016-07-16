@@ -1,0 +1,8 @@
+node_modules
+dist
+bower_components
+.tmp
+.publish/
+.firebaserc
+firebase.json
+database.rules.json
